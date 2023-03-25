@@ -1,0 +1,6 @@
+CREATE TABLE invoices (
+  id INT(11) AUTO_INCREMENT PRIMARY KEY,
+  client_name VARCHAR(255) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  due_date DATE NOT NULL
+);
