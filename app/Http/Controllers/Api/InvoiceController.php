@@ -26,7 +26,10 @@ class InvoiceController extends Controller
     public function index(): JsonResponse
     {
         $invoices = $this->invoiceService->getAllInvoices();
-        return response()->json($invoices);
+        return response()->json([
+            'success' => true,
+            'data' => $invoices
+        ]);
     }
 
     /**
@@ -54,16 +57,22 @@ class InvoiceController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
+                'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
         try {
             $invoice = $this->invoiceService->createInvoice($request->all());
-            return response()->json($invoice, 201);
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice created successfully',
+                'data' => $invoice
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
+                'success' => false,
                 'message' => 'An error occurred while creating the invoice.',
                 'error' => $e->getMessage()
             ], 500);
@@ -79,11 +88,15 @@ class InvoiceController extends Controller
 
         if (!$invoice) {
             return response()->json([
+                'success' => false,
                 'message' => "Invoice with ID $id not found."
             ], 404);
         }
 
-        return response()->json($invoice);
+        return response()->json([
+            'success' => true,
+            'data' => $invoice
+        ]);
     }
 
     /**
@@ -102,7 +115,7 @@ class InvoiceController extends Controller
             'discount_amount' => 'nullable|numeric|min:0',
             'status' => 'nullable|string|max:20',
             'notes' => 'nullable|string|max:1000',
-            'items' => 'sometimes|array|min:1',
+            'items' => 'sometimes|array',
             'items.*.description' => 'required_with:items|string|max:200',
             'items.*.quantity' => 'required_with:items|numeric|min:0',
             'items.*.unit_price' => 'required_with:items|numeric|min:0',
@@ -111,9 +124,10 @@ class InvoiceController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
+                'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
         try {
@@ -121,13 +135,19 @@ class InvoiceController extends Controller
 
             if (!$invoice) {
                 return response()->json([
+                    'success' => false,
                     'message' => "Invoice with ID $id not found."
                 ], 404);
             }
 
-            return response()->json($invoice);
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice updated successfully',
+                'data' => $invoice
+            ]);
         } catch (\Exception $e) {
             return response()->json([
+                'success' => false,
                 'message' => 'An error occurred while updating the invoice.',
                 'error' => $e->getMessage()
             ], 500);
@@ -143,11 +163,15 @@ class InvoiceController extends Controller
 
         if (!$deleted) {
             return response()->json([
+                'success' => false,
                 'message' => "Invoice with ID $id not found."
             ], 404);
         }
 
-        return response()->json(null, 204);
+        return response()->json([
+            'success' => true,
+            'message' => 'Invoice deleted successfully'
+        ], 200);
     }
 
     /**
@@ -156,7 +180,10 @@ class InvoiceController extends Controller
     public function byStatus(string $status): JsonResponse
     {
         $invoices = $this->invoiceService->getInvoicesByStatus($status);
-        return response()->json($invoices);
+        return response()->json([
+            'success' => true,
+            'data' => $invoices
+        ]);
     }
 
     /**
@@ -165,7 +192,10 @@ class InvoiceController extends Controller
     public function byCustomer(string $customerName): JsonResponse
     {
         $invoices = $this->invoiceService->getInvoicesByCustomer($customerName);
-        return response()->json($invoices);
+        return response()->json([
+            'success' => true,
+            'data' => $invoices
+        ]);
     }
 
     /**
