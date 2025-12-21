@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -16,7 +17,7 @@ class InvoiceCreated extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public Invoice $invoice)
     {
         //
     }
@@ -27,7 +28,7 @@ class InvoiceCreated extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invoice Created',
+            subject: 'New Invoice #' . $this->invoice->invoice_number . ' - ' . $this->invoice->customer_name,
         );
     }
 
@@ -37,7 +38,7 @@ class InvoiceCreated extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.invoice-created',
         );
     }
 
