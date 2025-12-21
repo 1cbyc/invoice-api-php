@@ -4,15 +4,15 @@ A comprehensive REST API for managing invoices, built with PHP following MVC arc
 
 ## Features
 
-- ✅ RESTful API endpoints
-- ✅ PDO with prepared statements (SQL injection protection)
-- ✅ Input validation
-- ✅ Proper error handling
-- ✅ MVC architecture
-- ✅ Invoice management with line items
-- ✅ Support for tax, discount calculations
-- ✅ Customer search and status filtering
-- ✅ CORS enabled
+- RESTful API endpoints
+- PDO with prepared statements (SQL injection protection)
+- Input validation
+- Proper error handling
+- MVC architecture
+- Invoice management with line items
+- Support for tax, discount calculations
+- Customer search and status filtering
+- CORS enabled
 
 ## Project Structure
 
@@ -94,24 +94,24 @@ POST /api/invoices
 Content-Type: application/json
 
 {
-  "invoice_number": "INV-2025-001",
-  "issue_date": "2025-01-01",
-  "due_date": "2025-01-31",
-  "customer_name": "Acme Corp",
-  "customer_address": "123 Main St",
-  "customer_email": "billing@acme.com",
-  "tax_amount": 0,
-  "discount_amount": 0,
-  "status": "Draft",
-  "notes": "First invoice",
-  "items": [
-    {
-      "description": "Web Development",
-      "quantity": 40,
-      "unit_price": 75.00,
-      "tax_rate": 10
-    }
-  ]
+    "invoice_number": "INV-2025-001",
+    "issue_date": "2025-01-01",
+    "due_date": "2025-01-31",
+    "customer_name": "Acme Corp",
+    "customer_address": "123 Main St",
+    "customer_email": "billing@acme.com",
+    "tax_amount": 0,
+    "discount_amount": 0,
+    "status": "Draft",
+    "notes": "First invoice",
+    "items": [
+        {
+            "description": "Web Development",
+            "quantity": 40,
+            "unit_price": 75.00,
+            "tax_rate": 10
+        }
+    ]
 }
 ```
 
@@ -121,8 +121,8 @@ PUT /api/invoices/{id}
 Content-Type: application/json
 
 {
-  "status": "Paid",
-  "notes": "Payment received"
+    "status": "Paid",
+    "notes": "Payment received"
 }
 ```
 
@@ -136,35 +136,35 @@ DELETE /api/invoices/{id}
 ### Success Response (200)
 ```json
 {
-  "id": 1,
-  "invoice_number": "INV-2025-001",
-  "issue_date": "2025-01-01",
-  "due_date": "2025-01-31",
-  "customer_name": "Acme Corp",
-  "sub_total": 3300.00,
-  "tax_amount": 0.00,
-  "discount_amount": 0.00,
-  "total_amount": 3300.00,
-  "status": "Draft",
-  "items": [...]
+    "id": 1,
+    "invoice_number": "INV-2025-001",
+    "issue_date": "2025-01-01",
+    "due_date": "2025-01-31",
+    "customer_name": "Acme Corp",
+    "sub_total": 3300.00,
+    "tax_amount": 0.00,
+    "discount_amount": 0.00,
+    "total_amount": 3300.00,
+    "status": "Draft",
+    "items": [...]
 }
 ```
 
 ### Error Response (400/404/500)
 ```json
 {
-  "message": "Invoice with ID 999 not found."
+    "message": "Invoice with ID 999 not found."
 }
 ```
 
 ## Security Features
 
-- ✅ PDO prepared statements prevent SQL injection
-- ✅ Input validation on all fields
-- ✅ Email validation
-- ✅ Proper HTTP status codes
-- ✅ Exception handling
-- ✅ Transaction support for data integrity
+- PDO prepared statements prevent SQL injection
+- Input validation on all fields
+- Email validation
+- Proper HTTP status codes
+- Exception handling
+- Transaction support for data integrity
 
 ## Requirements
 
@@ -182,18 +182,18 @@ curl http://localhost:8000/api/invoices
 
 # Create invoice
 curl -X POST http://localhost:8000/api/invoices \
-  -H "Content-Type: application/json" \
-  -d '{
-    "invoice_number": "INV-001",
-    "issue_date": "2025-01-01",
-    "due_date": "2025-01-31",
-    "customer_name": "Test Customer",
-    "items": [{
-      "description": "Service",
-      "quantity": 1,
-      "unit_price": 100
-    }]
-  }'
+    -H "Content-Type: application/json" \
+    -d '{
+        "invoice_number": "INV-001",
+        "issue_date": "2025-01-01",
+        "due_date": "2025-01-31",
+        "customer_name": "Test Customer",
+        "items": [{
+            "description": "Service",
+            "quantity": 1,
+            "unit_price": 100
+        }]
+    }'
 ```
 
 ## Differences from C# Version
@@ -207,3 +207,4 @@ curl -X POST http://localhost:8000/api/invoices \
 ## License
 
 MIT
+
