@@ -1,8 +1,8 @@
 # Invoice API - Laravel
 
-A comprehensive REST API for managing invoices, built with Laravel framework. This is a Laravel implementation of the C# Invoice API (found in the `c#/` folder) with Eloquent ORM, proper validation, and clean architecture.
+REST API for managing invoices, with Laravel framework...with Eloquent ORM, proper validation, and clean architecture.
 
-## Features
+## Currently...
 
 - RESTful API endpoints
 - Laravel Eloquent ORM with relationships
@@ -34,7 +34,6 @@ invoice-api-php/
 │       └── *_create_invoice_items_table.php
 ├── routes/
 │   └── api.php                            # API routes
-├── c#/                                    # C# reference implementation
 ├── .env                                   # Configuration
 └── artisan                                # Laravel CLI
 ```
