@@ -16,6 +16,8 @@ Route::prefix('invoices')->group(function () {
     Route::get('/status/{status}', [InvoiceController::class, 'byStatus']);
     Route::get('/customer/{customerName}', [InvoiceController::class, 'byCustomer']);
     Route::get('/{id}', [InvoiceController::class, 'show']);
+    Route::get('/{id}/pdf', [InvoiceController::class, 'viewPdf']);
+    Route::get('/{id}/pdf/download', [InvoiceController::class, 'downloadPdf']);
     Route::put('/{id}', [InvoiceController::class, 'update']);
     Route::delete('/{id}', [InvoiceController::class, 'destroy']);
     
