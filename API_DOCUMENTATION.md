@@ -1,325 +1,723 @@
-# Invoice API - Laravel
+# Invoice API Documentation
 
-REST API for managing invoices, with Laravel framework...with Eloquent ORM, proper validation, and clean architecture.
-
-## Currently...
-
-- RESTful API endpoints
-- Laravel Eloquent ORM with relationships
-- Request validation
-- Service layer architecture
-- Database transactions
-- Invoice management with line items
-- Automatic calculation of totals
-- Customer search and status filtering
-- CORS enabled
-
-## Project Structure
-
+## Base URL
 ```
-invoice-api-php/
-├── app/
-│   ├── Http/
-│   │   └── Controllers/
-│   │       └── Api/
-│   │           └── InvoiceController.php  # API endpoints
-│   ├── Models/
-│   │   ├── Invoice.php                    # Invoice model
-│   │   └── InvoiceItem.php                # Invoice item model
-│   └── Services/
-│       └── InvoiceService.php             # Business logic
-├── database/
-│   └── migrations/
-│       ├── *_create_invoices_table.php
-│       └── *_create_invoice_items_table.php
-├── routes/
-│   └── api.php                            # API routes
-├── .env                                   # Configuration
-└── artisan                                # Laravel CLI
+http://localhost:8000/api
 ```
 
-## Setup
+## Authentication
 
-### 1. Install Dependencies
-
-```bash
-composer install
+This API uses Laravel Sanctum for authentication. Include the token in the Authorization header:
+```
+Authorization: Bearer {your_token_here}
 ```
 
-### 2. Configure Environment
+---
 
-The `.env` file should already exist. Update database credentials:
+## Authentication Endpoints
 
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=invoice_db
-DB_USERNAME=root
-DB_PASSWORD=your_password
-```
+### Register
 
-### 3. Generate Application Key (if needed)
+**POST** `/register`
 
-```bash
-php artisan key:generate
-```
+Create a new user account.
 
-### 4. Run Migrations
-
-```bash
-php artisan migrate
-```
-
-### 5. Start Development Server
-
-```bash
-php artisan serve
-```
-
-The API will be available at `http://localhost:8000/api`
-
-## API Endpoints
-
-All endpoints are prefixed with `/api`
-
-### Get All Invoices
-```http
-GET /api/invoices
-```
-
-### Get Invoice by ID
-```http
-GET /api/invoices/{id}
-```
-
-### Get Invoices by Status
-```http
-GET /api/invoices/status/{status}
-```
-Status values: `Draft`, `Sent`, `Paid`, `Overdue`, `Cancelled`
-
-### Get Invoices by Customer
-```http
-GET /api/invoices/customer/{customerName}
-```
-
-### Create Invoice
-```http
-POST /api/invoices
-Content-Type: application/json
-
-{
-    "invoice_number": "INV-2025-001",
-    "issue_date": "2025-01-01",
-    "due_date": "2025-01-31",
-    "customer_name": "Acme Corp",
-    "customer_address": "123 Main St",
-    "customer_email": "billing@acme.com",
-    "tax_amount": 0,
-    "discount_amount": 0,
-    "status": "Draft",
-    "notes": "First invoice",
-    "items": [
-        {
-            "description": "Web Development",
-            "quantity": 40,
-            "unit_price": 75.00,
-            "tax_rate": 10
-        }
-    ]
-}
-```
-
-### Update Invoice
-```http
-PUT /api/invoices/{id}
-Content-Type: application/json
-
-{
-    "status": "Paid",
-    "notes": "Payment received"
-}
-```
-
-### Delete Invoice
-```http
-DELETE /api/invoices/{id}
-```
-
-## Response Format
-
-### Success Response (200)
+**Request Body:**
 ```json
 {
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "created_at": "2025-01-15T10:00:00.000000Z",
+      "updated_at": "2025-01-15T10:00:00.000000Z"
+    },
+    "access_token": "1|abc123...",
+    "token_type": "Bearer"
+  }
+}
+```
+
+---
+
+### Login
+
+**POST** `/login`
+
+Authenticate and receive an access token.
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com"
+    },
+    "access_token": "2|xyz789...",
+    "token_type": "Bearer"
+  }
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "success": false,
+  "message": "Invalid login credentials"
+}
+```
+
+---
+
+### Logout
+
+**POST** `/logout`
+
+Revoke the current access token.
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Logged out successfully"
+}
+```
+
+---
+
+### Get Current User
+
+**GET** `/user`
+
+Get the authenticated user's information.
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+  }
+}
+```
+
+---
+
+## Invoice Endpoints
+
+All invoice endpoints require authentication.
+
+### List All Invoices
+
+**GET** `/invoices`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "invoice_number": "INV-2025-001",
+      "issue_date": "2025-01-15",
+      "due_date": "2025-02-15",
+      "customer_name": "Acme Corporation",
+      "customer_email": "billing@acme.com",
+      "customer_address": "123 Business St, City, State 12345",
+      "sub_total": 1000.00,
+      "tax_amount": 100.00,
+      "discount_amount": 0.00,
+      "total_amount": 1100.00,
+      "amount_paid": 500.00,
+      "balance_due": 600.00,
+      "status": "Partially Paid",
+      "notes": "Net 30 payment terms",
+      "created_at": "2025-01-15T10:00:00.000000Z",
+      "updated_at": "2025-01-20T14:30:00.000000Z",
+      "items": [
+        {
+          "id": 1,
+          "description": "Web Development Services",
+          "quantity": 10,
+          "unit_price": 100.00,
+          "tax_rate": 0.00,
+          "line_total": 1000.00
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### Create Invoice
+
+**POST** `/invoices`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "invoice_number": "INV-2025-002",
+  "issue_date": "2025-01-15",
+  "due_date": "2025-02-15",
+  "customer_name": "Tech Solutions Inc",
+  "customer_email": "accounts@techsolutions.com",
+  "customer_address": "456 Tech Park, City, State 67890",
+  "tax_amount": 50.00,
+  "discount_amount": 10.00,
+  "status": "Draft",
+  "notes": "Payment due upon receipt",
+  "items": [
+    {
+      "description": "Consulting Services",
+      "quantity": 5,
+      "unit_price": 150.00,
+      "tax_rate": 0.00
+    },
+    {
+      "description": "Software License",
+      "quantity": 1,
+      "unit_price": 500.00,
+      "tax_rate": 10.00
+    }
+  ]
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Invoice created successfully",
+  "data": {
+    "id": 2,
+    "invoice_number": "INV-2025-002",
+    "issue_date": "2025-01-15",
+    "due_date": "2025-02-15",
+    "customer_name": "Tech Solutions Inc",
+    "customer_email": "accounts@techsolutions.com",
+    "total_amount": 1290.00,
+    "balance_due": 1290.00,
+    "status": "Draft",
+    "items": [...]
+  }
+}
+```
+
+**Note:** If `customer_email` is provided, an email notification will be sent automatically.
+
+---
+
+### Get Single Invoice
+
+**GET** `/invoices/{id}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
     "id": 1,
     "invoice_number": "INV-2025-001",
-    "issue_date": "2025-01-01",
-    "due_date": "2025-01-31",
-    "customer_name": "Acme Corp",
-    "customer_address": "123 Main St",
-    "customer_email": "billing@acme.com",
-    "sub_total": "3300.00",
-    "tax_amount": "0.00",
-    "discount_amount": "0.00",
-    "total_amount": "3300.00",
-    "status": "Draft",
-    "notes": "First invoice",
-    "created_at": "2025-01-01T10:00:00.000000Z",
-    "updated_at": "2025-01-01T10:00:00.000000Z",
-    "items": [
-        {
-            "id": 1,
-            "invoice_id": 1,
-            "description": "Web Development",
-            "quantity": "40.00",
-            "unit_price": "75.00",
-            "tax_rate": "10.00",
-            "line_total": "3300.00",
-            "created_at": "2025-01-01T10:00:00.000000Z",
-            "updated_at": "2025-01-01T10:00:00.000000Z"
-        }
-    ]
+    "customer_name": "Acme Corporation",
+    "total_amount": 1100.00,
+    "items": [...]
+  }
 }
 ```
 
-### Error Response (400/404/500)
+**Error Response (404):**
 ```json
 {
-    "message": "Invoice with ID 999 not found."
+  "success": false,
+  "message": "Invoice with ID 999 not found."
 }
 ```
 
-### Validation Error (400)
-```json
-{
-    "message": "Validation failed",
-    "errors": {
-        "invoice_number": ["The invoice number field is required."],
-        "items": ["At least one item is required."]
-    }
-}
-```
-
-## Validation Rules
-
-### Create Invoice
-- `invoice_number`: required, string, max 50 characters, unique
-- `issue_date`: required, date
-- `due_date`: required, date
-- `customer_name`: required, string, max 200 characters
-- `customer_address`: nullable, string, max 500 characters
-- `customer_email`: nullable, valid email, max 100 characters
-- `tax_amount`: nullable, numeric, min 0
-- `discount_amount`: nullable, numeric, min 0
-- `status`: nullable, string, max 20 characters
-- `notes`: nullable, string, max 1000 characters
-- `items`: required, array, min 1 item
-- `items.*.description`: required, string, max 200 characters
-- `items.*.quantity`: required, numeric, min 0
-- `items.*.unit_price`: required, numeric, min 0
-- `items.*.tax_rate`: nullable, numeric, min 0
+---
 
 ### Update Invoice
-All fields are optional but must meet the same validation rules when provided.
 
-## Security Features
+**PUT** `/invoices/{id}`
 
-- Laravel's built-in SQL injection protection via Eloquent ORM
-- Request validation with detailed error messages
-- Database transactions for data integrity
-- CORS configuration
-- Proper HTTP status codes
-- Exception handling
-
-## Database Schema
-
-### Invoices Table
-- `id`: Primary key
-- `invoice_number`: Unique identifier (indexed)
-- `issue_date`: Date
-- `due_date`: Date
-- `customer_name`: String (indexed)
-- `customer_address`: Text (nullable)
-- `customer_email`: String (nullable)
-- `sub_total`: Decimal(18,2)
-- `tax_amount`: Decimal(18,2)
-- `discount_amount`: Decimal(18,2)
-- `total_amount`: Decimal(18,2)
-- `status`: String (indexed)
-- `notes`: Text (nullable)
-- `created_at`: Timestamp
-- `updated_at`: Timestamp
-
-### Invoice Items Table
-- `id`: Primary key
-- `invoice_id`: Foreign key (cascade delete)
-- `description`: String
-- `quantity`: Decimal(18,2)
-- `unit_price`: Decimal(18,2)
-- `tax_rate`: Decimal(18,2)
-- `line_total`: Decimal(18,2)
-- `created_at`: Timestamp
-- `updated_at`: Timestamp
-
-## Requirements
-
-- PHP 8.2+
-- Composer
-- MySQL 5.7+ / MariaDB 10.2+ / PostgreSQL 9.6+
-- Laravel 12.x
-
-## Testing with cURL
-
-```bash
-# Get all invoices
-curl http://localhost:8000/api/invoices
-
-# Create invoice
-curl -X POST http://localhost:8000/api/invoices \
-    -H "Content-Type: application/json" \
-    -d '{
-        "invoice_number": "INV-001",
-        "issue_date": "2025-01-01",
-        "due_date": "2025-01-31",
-        "customer_name": "Test Customer",
-        "items": [{
-            "description": "Service",
-            "quantity": 1,
-            "unit_price": 100
-        }]
-    }'
-
-# Get invoice by ID
-curl http://localhost:8000/api/invoices/1
-
-# Update invoice
-curl -X PUT http://localhost:8000/api/invoices/1 \
-    -H "Content-Type: application/json" \
-    -d '{"status": "Paid"}'
-
-# Delete invoice
-curl -X DELETE http://localhost:8000/api/invoices/1
-
-# Get invoices by status
-curl http://localhost:8000/api/invoices/status/Draft
-
-# Get invoices by customer
-curl http://localhost:8000/api/invoices/customer/Acme
+**Headers:**
+```
+Authorization: Bearer {token}
 ```
 
-## Laravel Advantages
+**Request Body** (all fields optional):
+```json
+{
+  "customer_name": "Updated Company Name",
+  "status": "Sent",
+  "notes": "Updated payment terms",
+  "items": []
+}
+```
 
-- **Eloquent ORM**: Clean database interactions with relationships
-- **Request Validation**: Built-in validation with detailed error messages
-- **Service Container**: Automatic dependency injection
-- **Database Transactions**: Atomic operations for data integrity
-- **Migrations**: Version control for database schema
-- **Artisan Console**: Code generation and task automation
-- **Built-in Testing**: PHPUnit integration for API testing
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Invoice updated successfully",
+  "data": {
+    "id": 1,
+    "customer_name": "Updated Company Name",
+    "status": "Sent",
+    ...
+  }
+}
+```
 
-## License
+---
 
-MIT
+### Delete Invoice
+
+**DELETE** `/invoices/{id}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Invoice deleted successfully"
+}
+```
+
+---
+
+### Filter Invoices by Status
+
+**GET** `/invoices/status/{status}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Parameters:**
+- `status`: Draft, Sent, Paid, Partially Paid, Overdue
+
+**Example:**
+```
+GET /invoices/status/Paid
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 3,
+      "status": "Paid",
+      ...
+    }
+  ]
+}
+```
+
+---
+
+### Filter Invoices by Customer
+
+**GET** `/invoices/customer/{customerName}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Example:**
+```
+GET /invoices/customer/Acme Corporation
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "customer_name": "Acme Corporation",
+      ...
+    }
+  ]
+}
+```
+
+---
+
+### View Invoice PDF
+
+**GET** `/invoices/{id}/pdf`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:** PDF file displayed in browser
+
+---
+
+### Download Invoice PDF
+
+**GET** `/invoices/{id}/pdf/download`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:** PDF file download
+
+**Filename Format:** `invoice-{invoice_number}.pdf`
+
+---
+
+## Payment Endpoints
+
+All payment endpoints require authentication.
+
+### Record Payment
+
+**POST** `/invoices/{invoiceId}/payments`
+
+Record a payment against an invoice.
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "amount": 500.00,
+  "payment_date": "2025-01-20",
+  "payment_method": "Bank Transfer",
+  "reference_number": "TXN-123456",
+  "notes": "Payment for January services"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Payment recorded successfully",
+  "data": {
+    "payment": {
+      "id": 1,
+      "invoice_id": 1,
+      "amount": 500.00,
+      "payment_date": "2025-01-20",
+      "payment_method": "Bank Transfer",
+      "reference_number": "TXN-123456",
+      "notes": "Payment for January services",
+      "created_at": "2025-01-20T15:00:00.000000Z"
+    },
+    "invoice": {
+      "id": 1,
+      "total_amount": 1100.00,
+      "amount_paid": 500.00,
+      "balance_due": 600.00,
+      "status": "Partially Paid"
+    }
+  }
+}
+```
+
+**Error Response (422) - Overpayment:**
+```json
+{
+  "success": false,
+  "message": "Payment amount exceeds the remaining balance of $600.00"
+}
+```
+
+**Automatic Status Updates:**
+- Payment creates a record in the `payments` table
+- Invoice `amount_paid` is updated
+- Invoice `balance_due` is recalculated
+- Invoice `status` changes to:
+  - `"Partially Paid"` if balance > 0
+  - `"Paid"` if balance = 0
+- If fully paid, `paid_date` is set
+
+---
+
+### List Invoice Payments
+
+**GET** `/invoices/{invoiceId}/payments`
+
+Get all payments for a specific invoice.
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "amount": 500.00,
+      "payment_date": "2025-01-20",
+      "payment_method": "Bank Transfer",
+      "reference_number": "TXN-123456",
+      "notes": "Payment for January services"
+    },
+    {
+      "id": 2,
+      "amount": 300.00,
+      "payment_date": "2025-01-25",
+      "payment_method": "Credit Card",
+      "reference_number": "TXN-789012",
+      "notes": "Second installment"
+    }
+  ]
+}
+```
+
+---
+
+## Error Responses
+
+### Validation Error (422)
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "email": [
+      "The email field is required."
+    ],
+    "password": [
+      "The password field must be at least 8 characters."
+    ]
+  }
+}
+```
+
+### Unauthorized (401)
+```json
+{
+  "message": "Unauthenticated."
+}
+```
+
+### Not Found (404)
+```json
+{
+  "success": false,
+  "message": "Invoice with ID 999 not found."
+}
+```
+
+### Server Error (500)
+```json
+{
+  "success": false,
+  "message": "An error occurred while processing your request.",
+  "error": "Detailed error message"
+}
+```
+
+---
+
+## Field Descriptions
+
+### Invoice Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| invoice_number | string(50) | Yes | Unique invoice identifier |
+| issue_date | date | Yes | Date invoice was issued |
+| due_date | date | Yes | Payment due date |
+| customer_name | string(200) | Yes | Customer or company name |
+| customer_email | string(100) | No | Customer email (triggers notification) |
+| customer_address | string(500) | No | Customer billing address |
+| sub_total | decimal | Auto | Calculated from items |
+| tax_amount | decimal | No | Additional tax amount |
+| discount_amount | decimal | No | Discount applied |
+| total_amount | decimal | Auto | sub_total + tax - discount |
+| amount_paid | decimal | Auto | Total payments received |
+| balance_due | decimal | Auto | Remaining amount |
+| status | string | No | Draft, Sent, Paid, Partially Paid, Overdue |
+| notes | text | No | Additional notes or terms |
+
+### Invoice Item Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| description | string(200) | Yes | Service or product description |
+| quantity | decimal | Yes | Quantity of items |
+| unit_price | decimal | Yes | Price per unit |
+| tax_rate | decimal | No | Tax rate percentage (e.g., 10 for 10%) |
+| line_total | decimal | Auto | quantity × unit_price × (1 + tax_rate/100) |
+
+### Payment Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| amount | decimal | Yes | Payment amount (min: 0.01) |
+| payment_date | date | Yes | Date payment was received |
+| payment_method | string(50) | Yes | Method (e.g., Bank Transfer, Credit Card, Cash, Check) |
+| reference_number | string(100) | No | Transaction or check number |
+| notes | text | No | Additional payment notes |
+
+---
+
+## Example Workflow
+
+### 1. Register & Login
+```bash
+# Register
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+  }'
+
+# Save the token from response
+TOKEN="your_token_here"
+```
+
+### 2. Create an Invoice
+```bash
+curl -X POST http://localhost:8000/api/invoices \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "invoice_number": "INV-001",
+    "issue_date": "2025-01-15",
+    "due_date": "2025-02-15",
+    "customer_name": "Acme Corp",
+    "customer_email": "billing@acme.com",
+    "items": [{
+      "description": "Web Development",
+      "quantity": 10,
+      "unit_price": 100
+    }]
+  }'
+```
+
+### 3. Record a Payment
+```bash
+curl -X POST http://localhost:8000/api/invoices/1/payments \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 500,
+    "payment_date": "2025-01-20",
+    "payment_method": "Bank Transfer",
+    "reference_number": "TXN-123"
+  }'
+```
+
+### 4. Download PDF
+```bash
+curl -X GET http://localhost:8000/api/invoices/1/pdf/download \
+  -H "Authorization: Bearer $TOKEN" \
+  --output invoice.pdf
+```
+
+---
+
+## Testing
+
+Run the test suite:
+```bash
+php artisan test
+```
+
+Test coverage includes:
+- ✓ Authentication (register, login, logout)
+- ✓ Invoice CRUD operations
+- ✓ Invoice filtering by status and customer
+- ✓ Payment recording and tracking
+- ✓ Overpayment prevention
+- ✓ Authorization checks
+- ✓ Validation rules
+
+---
+
+## Rate Limiting
+
+API requests are rate-limited to prevent abuse. Default limits apply per minute per user.
+
+---
+
+## Support
+
+For issues or questions, please contact the development team or refer to the project README.
 
 
