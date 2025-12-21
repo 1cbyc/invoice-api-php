@@ -8,10 +8,15 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentService
 {
-    public function recordPayment(int $invoiceId, array $data): Payment
+    public function recordPayment(int $invoiceId, array $data): array
     {
         return DB::transaction(function () use ($invoiceId, $data) {
             $invoice = Invoice::findOrFail($invoiceId);
+            
+            // Check if payment would exceed balance due
+            if ($data['amount'] > $invoice->balance_due) {
+                throw new \Exception('Payment amount exceeds the remaining balance of $' . number_format($invoice->balance_due, 2));
+            }
             
             // Create payment record
             $payment = Payment::create([
@@ -36,7 +41,14 @@ class PaymentService
                 'status' => $balanceDue <= 0 ? 'Paid' : 'Partially Paid',
             ]);
             
-            return $payment->load('invoice');
+            return [
+                'success' => true,
+                'message' => 'Payment recorded successfully',
+                'data' => [
+                    'payment' => $payment,
+                    'invoice' => $invoice->fresh()
+                ]
+            ];
         });
     }
     
