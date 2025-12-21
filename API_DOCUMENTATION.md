@@ -1,6 +1,6 @@
 # Invoice API - Laravel
 
-A comprehensive REST API for managing invoices, built with Laravel framework. This is a Laravel implementation of the C# Invoice API with Eloquent ORM, proper validation, and clean architecture.
+A comprehensive REST API for managing invoices, built with Laravel framework. This is a Laravel implementation of the C# Invoice API (found in the `c#/` folder) with Eloquent ORM, proper validation, and clean architecture.
 
 ## Features
 
@@ -17,7 +17,7 @@ A comprehensive REST API for managing invoices, built with Laravel framework. Th
 ## Project Structure
 
 ```
-laravel-app/
+invoice-api-php/
 ├── app/
 │   ├── Http/
 │   │   └── Controllers/
@@ -34,7 +34,9 @@ laravel-app/
 │       └── *_create_invoice_items_table.php
 ├── routes/
 │   └── api.php                            # API routes
-└── .env                                   # Configuration
+├── c#/                                    # C# reference implementation
+├── .env                                   # Configuration
+└── artisan                                # Laravel CLI
 ```
 
 ## Setup
@@ -42,13 +44,12 @@ laravel-app/
 ### 1. Install Dependencies
 
 ```bash
-cd laravel-app
 composer install
 ```
 
 ### 2. Configure Environment
 
-Copy `.env.example` to `.env` and update database credentials:
+The `.env` file should already exist. Update database credentials:
 
 ```env
 DB_CONNECTION=mysql
@@ -59,7 +60,7 @@ DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
 
-### 3. Generate Application Key
+### 3. Generate Application Key (if needed)
 
 ```bash
 php artisan key:generate
