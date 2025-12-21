@@ -32,9 +32,10 @@ class PaymentController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
+                'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
-            ], 400);
+            ], 422);
         }
 
         try {
@@ -42,9 +43,9 @@ class PaymentController extends Controller
             return response()->json($payment, 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'An error occurred while recording the payment.',
-                'error' => $e->getMessage()
-            ], 500);
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
         }
     }
 
@@ -54,6 +55,9 @@ class PaymentController extends Controller
     public function index(int $invoiceId): JsonResponse
     {
         $payments = $this->paymentService->getInvoicePayments($invoiceId);
-        return response()->json($payments);
+        return response()->json([
+            'success' => true,
+            'data' => $payments
+        ]);
     }
 }
