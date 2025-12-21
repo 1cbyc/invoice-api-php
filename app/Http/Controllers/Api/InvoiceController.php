@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\InvoiceService;
+use App\Services\PdfService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -11,10 +12,12 @@ use Illuminate\Support\Facades\Validator;
 class InvoiceController extends Controller
 {
     protected InvoiceService $invoiceService;
+    protected PdfService $pdfService;
 
-    public function __construct(InvoiceService $invoiceService)
+    public function __construct(InvoiceService $invoiceService, PdfService $pdfService)
     {
         $this->invoiceService = $invoiceService;
+        $this->pdfService = $pdfService;
     }
 
     /**
@@ -163,6 +166,38 @@ class InvoiceController extends Controller
     {
         $invoices = $this->invoiceService->getInvoicesByCustomer($customerName);
         return response()->json($invoices);
+    }
+
+    /**
+     * Download invoice as PDF.
+     */
+    public function downloadPdf(int $id)
+    {
+        $invoice = $this->invoiceService->getInvoiceById($id);
+        
+        if (!$invoice) {
+            return response()->json([
+                'message' => "Invoice with ID $id not found."
+            ], 404);
+        }
+        
+        return $this->pdfService->downloadInvoicePdf($invoice);
+    }
+
+    /**
+     * View invoice PDF in browser.
+     */
+    public function viewPdf(int $id)
+    {
+        $invoice = $this->invoiceService->getInvoiceById($id);
+        
+        if (!$invoice) {
+            return response()->json([
+                'message' => "Invoice with ID $id not found."
+            ], 404);
+        }
+        
+        return $this->pdfService->streamInvoicePdf($invoice);
     }
 }
 
