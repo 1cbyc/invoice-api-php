@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,4 +18,8 @@ Route::prefix('invoices')->group(function () {
     Route::get('/{id}', [InvoiceController::class, 'show']);
     Route::put('/{id}', [InvoiceController::class, 'update']);
     Route::delete('/{id}', [InvoiceController::class, 'destroy']);
+    
+    // Payment routes
+    Route::get('/{invoiceId}/payments', [PaymentController::class, 'index']);
+    Route::post('/{invoiceId}/payments', [PaymentController::class, 'store']);
 });
