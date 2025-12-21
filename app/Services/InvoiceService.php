@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Mail\InvoiceCreated;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Collection;
 
 class InvoiceService
@@ -67,7 +69,15 @@ class InvoiceService
                 ]);
             }
             
-            return $invoice->load('items');
+            // Load items relationship
+            $invoice->load('items');
+            
+            // Send email notification if customer has an email
+            if ($invoice->customer_email) {
+                Mail::to($invoice->customer_email)->send(new InvoiceCreated($invoice));
+            }
+            
+            return $invoice;
         });
     }
 
