@@ -1,0 +1,392 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Invoice API (PHP)",
+    "description": "RESTful API for invoice management with payment tracking, PDF generation, and email notifications",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User registration and authentication"
+    },
+    {
+      "name": "Invoices",
+      "description": "Invoice management operations"
+    },
+    {
+      "name": "Payments",
+      "description": "Payment tracking and recording"
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password", "password_confirmation"],
+                "properties": {
+                  "name": { "type": "string", "example": "John Doe" },
+                  "email": { "type": "string", "format": "email", "example": "john@example.com" },
+                  "password": { "type": "string", "format": "password", "example": "password123" },
+                  "password_confirmation": { "type": "string", "format": "password", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "john@example.com" },
+                  "password": { "type": "string", "format": "password", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "User information"
+          }
+        }
+      }
+    },
+    "/invoices": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "List all invoices",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of invoices"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Invoices"],
+        "summary": "Create new invoice",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["invoice_number", "issue_date", "due_date", "customer_name", "items"],
+                "properties": {
+                  "invoice_number": { "type": "string", "example": "INV-2025-001" },
+                  "issue_date": { "type": "string", "format": "date", "example": "2025-01-15" },
+                  "due_date": { "type": "string", "format": "date", "example": "2025-02-15" },
+                  "customer_name": { "type": "string", "example": "Acme Corporation" },
+                  "customer_email": { "type": "string", "format": "email", "example": "billing@acme.com" },
+                  "customer_address": { "type": "string", "example": "123 Business St" },
+                  "tax_amount": { "type": "number", "example": 100 },
+                  "discount_amount": { "type": "number", "example": 0 },
+                  "status": { "type": "string", "enum": ["Draft", "Sent", "Paid", "Partially Paid", "Overdue"], "example": "Draft" },
+                  "notes": { "type": "string", "example": "Net 30 payment terms" },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["description", "quantity", "unit_price"],
+                      "properties": {
+                        "description": { "type": "string", "example": "Web Development Services" },
+                        "quantity": { "type": "number", "example": 10 },
+                        "unit_price": { "type": "number", "example": 100 },
+                        "tax_rate": { "type": "number", "example": 0 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invoice created successfully"
+          }
+        }
+      }
+    },
+    "/invoices/{id}": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "Get single invoice",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice details"
+          },
+          "404": {
+            "description": "Invoice not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Invoices"],
+        "summary": "Update invoice",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_name": { "type": "string" },
+                  "status": { "type": "string" },
+                  "notes": { "type": "string" },
+                  "items": { "type": "array", "items": { "type": "object" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invoice updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Invoices"],
+        "summary": "Delete invoice",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice deleted successfully"
+          }
+        }
+      }
+    },
+    "/invoices/status/{status}": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "Filter invoices by status",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "enum": ["Draft", "Sent", "Paid", "Partially Paid", "Overdue"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered invoices"
+          }
+        }
+      }
+    },
+    "/invoices/customer/{customerName}": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "Filter invoices by customer",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "customerName",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer invoices"
+          }
+        }
+      }
+    },
+    "/invoices/{id}/pdf": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "View invoice PDF",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF file"
+          }
+        }
+      }
+    },
+    "/invoices/{id}/pdf/download": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "Download invoice PDF",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF download"
+          }
+        }
+      }
+    },
+    "/invoices/{invoiceId}/payments": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "List invoice payments",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "invoiceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment history"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Record payment",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "invoiceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount", "payment_date", "payment_method"],
+                "properties": {
+                  "amount": { "type": "number", "example": 500.00 },
+                  "payment_date": { "type": "string", "format": "date", "example": "2025-01-20" },
+                  "payment_method": { "type": "string", "example": "Bank Transfer" },
+                  "reference_number": { "type": "string", "example": "TXN-123456" },
+                  "notes": { "type": "string", "example": "Payment for January services" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment recorded successfully"
+          },
+          "422": {
+            "description": "Validation error or overpayment"
+          }
+        }
+      }
+    }
+  }
+}
