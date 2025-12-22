@@ -1,5 +1,7 @@
 # Invoice API Documentation
 
+![Available Endpoints](screenshots/available-endpoints-Screenshot-2025-12-21-155636.png)
+
 ## Base URL
 ```
 http://localhost:8000/api
@@ -15,6 +17,8 @@ Authorization: Bearer {your_token_here}
 ---
 
 ## Authentication Endpoints
+
+![Authentication Endpoints](screenshots/auth-endpoints-Screenshot-2025-12-21-160521.png)
 
 ### Register
 
@@ -143,6 +147,8 @@ Authorization: Bearer {token}
 ---
 
 ## Invoice Endpoints
+
+![Invoice Endpoints](screenshots/invoices-endpoints-Screenshot-2025-12-21-160536.png)
 
 All invoice endpoints require authentication.
 
@@ -438,6 +444,8 @@ Authorization: Bearer {token}
 
 ## Payment Endpoints
 
+![Payment Endpoints](screenshots/payments-endpoints-Screenshot-2025-12-21-160547.png)
+
 All payment endpoints require authentication.
 
 ### Record Payment
@@ -699,6 +707,8 @@ Run the test suite:
 php artisan test
 ```
 
+![All Tests Passing](screenshots/tests-Screenshot-2025-12-21-161222.png)
+
 Test coverage includes:
 - ✓ Authentication (register, login, logout)
 - ✓ Invoice CRUD operations
@@ -716,8 +726,23 @@ API requests are rate-limited to prevent abuse. Default limits apply per minute 
 
 ---
 
-## Support
+## Support & Community
 
-For issues or questions, please contact the development team or refer to the project README.
+### Connect with Me
+Follow me on Twitter/X for updates and discussions: **[@1cbyc](https://x.com/1cbyc)**
+
+### Report Issues
+Found a bug or have a feature request?  
+**[Create an Issue on GitHub](https://github.com/1cbyc/invoice-api-php/issues/new)**
+
+### Documentation
+For more information, refer to the [project README](README.md).
+
+---
+
+## License & Credits
+
+I built this shii with Laravel  
+API Documentation | Version 2.0.0
 
 
