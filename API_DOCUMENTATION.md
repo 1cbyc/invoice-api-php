@@ -287,6 +287,20 @@ Authorization: Bearer {token}
 
 **Note:** If `customer_email` is provided, an email notification will be sent automatically.
 
+#### Email Notification
+
+When creating an invoice with a `customer_email`, the system automatically sends a professionally formatted email notification:
+
+![Sent Email Notification](screenshots/sent-mail-Screenshot-2025-12-21-173320.png)
+
+The email includes:
+- Professional green header design
+- Complete invoice details (number, customer, dates, status, amount)
+- Itemized list of products/services
+- Status badge with color coding
+- Total amount highlighted
+- Automated footer with branding
+
 ---
 
 ### Get Single Invoice

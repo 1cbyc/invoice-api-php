@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        .invoice-details {
+            background-color: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-details td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .invoice-details td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+        .total {
+            font-size: 1.2em;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9em;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .status-draft { background-color: #ffeaa7; color: #2d3436; }
+        .status-sent { background-color: #74b9ff; color: #2d3436; }
+        .status-paid { background-color: #55efc4; color: #2d3436; }
+        .status-overdue { background-color: #ff7675; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>New Invoice Created</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello,</p>
+        <p>A new invoice has been created for <strong>Email Test Customer</strong>.</p>
+        
+        <div class="invoice-details">
+            <table>
+                <tr>
+                    <td>Invoice Number:</td>
+                    <td>#EMAIL-TEST-003</td>
+                </tr>
+                <tr>
+                    <td>Customer:</td>
+                    <td>Email Test Customer</td>
+                </tr>
+                                <tr>
+                    <td>Email:</td>
+                    <td>customer@emailtest.com</td>
+                </tr>
+                                <tr>
+                    <td>Invoice Date:</td>
+                    <td>December 22, 2025</td>
+                </tr>
+                <tr>
+                    <td>Due Date:</td>
+                    <td>January 21, 2026</td>
+                </tr>
+                <tr>
+                    <td>Status:</td>
+                    <td>
+                        <span class="status status-sent">
+                            Sent
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Total Amount:</td>
+                    <td class="total">$100.00</td>
+                </tr>
+            </table>
+        </div>
+
+                <h3>Invoice Items</h3>
+        <div class="invoice-details">
+            <table>
+                                <tr>
+                    <td>Email Test Service</td>
+                    <td style="text-align: right;">
+                        1.00 x $100.00 = 
+                        $100.00
+                    </td>
+                </tr>
+                            </table>
+        </div>
+        
+                
+        <p>You can view or download this invoice from your dashboard.</p>
+    </div>
+    
+    <div class="footer">
+        <p>This is an automated email. Please do not reply to this message.</p>
+        <p>&copy; 2025 Invoice API. All rights reserved.</p>
+    </div>
+</body>
+</html>
