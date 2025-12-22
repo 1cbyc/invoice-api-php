@@ -25,3 +25,4 @@ Thumbs.db
 composer.phar
 composer.lock
 *.ps1
+*.zip
