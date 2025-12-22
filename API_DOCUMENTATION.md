@@ -2,10 +2,35 @@
 
 ![Available Endpoints](screenshots/available-endpoints-Screenshot-2025-12-21-155636.png)
 
-## Base URL
+## 🚀 Quick Start
+
+**Try the live API now!**
+```bash
+# Register a new account
+curl -X POST https://invoice-api.nidful.xyz/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Your Name","email":"your@email.com","password":"password123","password_confirmation":"password123"}'
+```
+
+**Explore with Swagger UI:** [https://invoice-api.nidful.xyz/api/documentation](https://invoice-api.nidful.xyz/api/documentation)
+
+---
+
+## Base URLs
+
+**Local Development:**
 ```
 http://localhost:8000/api
 ```
+
+**Production (Live):**
+```
+https://invoice-api.nidful.xyz/api
+```
+
+**Interactive API Documentation:**
+- Local: http://localhost:8000/api/documentation
+- Live: https://invoice-api.nidful.xyz/api/documentation
 
 ## Authentication
 
@@ -644,8 +669,9 @@ Authorization: Bearer {token}
 ## Example Workflow
 
 ### 1. Register & Login
+
+**Local:**
 ```bash
-# Register
 curl -X POST http://localhost:8000/api/register \
   -H "Content-Type: application/json" \
   -d '{
@@ -654,12 +680,28 @@ curl -X POST http://localhost:8000/api/register \
     "password": "password123",
     "password_confirmation": "password123"
   }'
+```
 
+**Live:**
+```bash
+curl -X POST https://invoice-api.nidful.xyz/api/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+  }'
+```
+
+```bash
 # Save the token from response
 TOKEN="your_token_here"
 ```
 
 ### 2. Create an Invoice
+
+**Local:**
 ```bash
 curl -X POST http://localhost:8000/api/invoices \
   -H "Authorization: Bearer $TOKEN" \
@@ -678,7 +720,28 @@ curl -X POST http://localhost:8000/api/invoices \
   }'
 ```
 
+**Live:**
+```bash
+curl -X POST https://invoice-api.nidful.xyz/api/invoices \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "invoice_number": "INV-001",
+    "issue_date": "2025-01-15",
+    "due_date": "2025-02-15",
+    "customer_name": "Acme Corp",
+    "customer_email": "billing@acme.com",
+    "items": [{
+      "description": "Web Development",
+      "quantity": 10,
+      "unit_price": 100
+    }]
+  }'
+```
+
 ### 3. Record a Payment
+
+**Local:**
 ```bash
 curl -X POST http://localhost:8000/api/invoices/1/payments \
   -H "Authorization: Bearer $TOKEN" \
@@ -691,9 +754,31 @@ curl -X POST http://localhost:8000/api/invoices/1/payments \
   }'
 ```
 
+**Live:**
+```bash
+curl -X POST https://invoice-api.nidful.xyz/api/invoices/1/payments \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 500,
+    "payment_date": "2025-01-20",
+    "payment_method": "Bank Transfer",
+    "reference_number": "TXN-123"
+  }'
+```
+
 ### 4. Download PDF
+
+**Local:**
 ```bash
 curl -X GET http://localhost:8000/api/invoices/1/pdf/download \
+  -H "Authorization: Bearer $TOKEN" \
+  --output invoice.pdf
+```
+
+**Live:**
+```bash
+curl -X GET https://invoice-api.nidful.xyz/api/invoices/1/pdf/download \
   -H "Authorization: Bearer $TOKEN" \
   --output invoice.pdf
 ```
